@@ -9,7 +9,7 @@ const Server = mongodb.Server;
 
 const app = express();
 const port = 5001;
-const mongoIp = '192.168.1.5';
+const mongoContainerName = 'alleys-db';
 const secretKey = 'pleasekeepthissecret';
 
 // Parse JSON in incoming request bodys
@@ -29,7 +29,7 @@ app.post('/register', async (req, res) => {
     // Generate hash
     const h = await bcrypt.hashSync(p, 10);
     // Upsert data
-    const svr = new Server(mongoIp, 27017);
+    const svr = new Server(mongoContainerName, 27017);
     const con = await MongoClient.connect(svr);
     const col = con.db('alleys').collection('auth');
     const dbRes = await col.updateOne(
@@ -59,7 +59,7 @@ app.post('/issue/:username', async (req, res) => {
       return res.status(422).end();
     }
     // Search DB
-    const svr = new Server(mongoIp, 27017);
+    const svr = new Server(mongoContainerName, 27017);
     const con = await MongoClient.connect(svr);
     const col = con.db('alleys').collection('auth');
     const doc = await col.findOne({username: u});

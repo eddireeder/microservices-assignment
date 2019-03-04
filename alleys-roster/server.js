@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongodb = require('mongodb');
+const request = require('request');
 
 const MongoClient = mongodb.MongoClient;
 const Server = mongodb.Server;
@@ -24,6 +25,40 @@ app.get('/roster', async (req, res) => {
     con.close();
     // Response with 'Success' and JSON
     res.status(200).json(dbRes).end();
+  } catch (e) {
+    console.log(e);
+    // Respond with 'Internal Server Error'
+    res.status(500).end();
+  }
+});
+
+
+// Middleware to check that the sender is allowed to create/edit the driver
+app.use('/roster/:driverUsername', (req, res, next) => {
+  try {
+    // Retrieve JWT header
+    const authHeader = req.headers.authorization;
+    // Request session object from auth service
+    const options = {
+      uri: 'http://alleys-authentication:5001/session',
+      json: true,
+      headers: {'Authorization': authHeader}
+    };
+    request.get(options, (authErr, authRes, authBody) => {
+      if (authErr) {
+        throw(authErr);
+      }
+      if (authRes.statusCode == 401) {
+        // Respond with 'Unauthorised'
+        return res.status(401).end();
+      }
+      // Check session object username matches url username
+      if (authBody.username != req.params.driverUsername) {
+        // Respond with 'Unauthorised'
+        return res.status(401).end();
+      }
+      next();
+    });
   } catch (e) {
     console.log(e);
     // Respond with 'Internal Server Error'
@@ -75,7 +110,7 @@ app.delete('/roster/:driverUsername', async (req, res) => {
     const svr = new Server(mongoContainerName, 27017);
     const con = await MongoClient.connect(svr);
     const col = con.db('alleys').collection('roster');
-    const dbRes = await col.remove(
+    const dbRes = await col.deleteOne(
       {username: username}
     );
     con.close();
