@@ -40,7 +40,16 @@ app.get('/bestDriver', (req, res) => {
           price: null
         }).end();
       }
-      request.get({url: 'http://alleys-mapping:5003/route', qs: {start: start, end: end}}, {json: true}, (routeErr, routeRes, routeBody) => {
+      // Get route info from mapping service
+      const options = {
+        uri: 'http://alleys-mapping:5002/route',
+        json: true,
+        qs: {
+          start: start,
+          end: end
+        }
+      };
+      request.get(options, (routeErr, routeRes, routeBody) => {
         if (routeErr) {
           throw(routeErr);
         }
@@ -74,6 +83,8 @@ app.get('/bestDriver', (req, res) => {
         if (currentHour >= 23 || currentHour < 5) {
           price = price*2;
         }
+        // Round and convert price to pounds
+        price = Math.round(price)/100;
         // Respond with 'Success' and JSON
         res.status(200).json({
           driver: bestDriver,
