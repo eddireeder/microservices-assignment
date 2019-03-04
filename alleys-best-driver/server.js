@@ -65,7 +65,7 @@ app.get('/bestDriver', (req, res) => {
           const instructions = step.html_instructions;
           for (let i = 0; i < instructions.length; i++) {
             if (instructions[i] == 'A' && !(isNaN(parseInt(instructions[i + 1], 10)))) {
-              distanceOnARoads += (step.distance/1000);
+              distanceOnARoads += (step.distance.value/1000);
               break;
             }
           }
