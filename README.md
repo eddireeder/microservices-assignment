@@ -21,7 +21,7 @@ At the project root, build the Docker images with:
 </p>
 
 ```
-docker build -t authimage alleys-authentication/
+docker build -t authenticationimage alleys-authentication/
 docker build -t mappingimage alleys-mapping/
 docker build -t rosterimage alleys-roster/
 docker build -t bestdriverimage alleys-best-driver/
