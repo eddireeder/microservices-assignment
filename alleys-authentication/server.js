@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const mongodb = require('mongodb');
 const jwt = require('jwt-simple');
 const bcrypt = require('bcryptjs');
+const fs = require('fs');
+const spdy = require('spdy');
 
 const MongoClient = mongodb.MongoClient;
 const Server = mongodb.Server;
@@ -111,7 +113,13 @@ app.get('/session', (req, res) => {
 });
 
 
+// Create server
+const server = spdy.createServer({
+  key: fs.readFileSync('certificates/key.pem'),
+  cert: fs.readFileSync('certificates/cert.pem')
+}, app);
+
 // Start listening
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });

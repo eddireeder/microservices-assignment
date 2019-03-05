@@ -40,9 +40,12 @@ app.use('/roster/:driverUsername', (req, res, next) => {
     const authHeader = req.headers.authorization;
     // Request session object from auth service
     const options = {
-      uri: 'http://alleys-authentication:5001/session',
+      uri: 'https://alleys-authentication:5001/session',
       json: true,
-      headers: {'Authorization': authHeader}
+      headers: {'Authorization': authHeader},
+      agentOptions: {
+        rejectUnauthorized: false
+      }
     };
     request.get(options, (authErr, authRes, authBody) => {
       if (authErr) {
