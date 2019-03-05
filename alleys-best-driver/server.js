@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const request = require('request');
+const fs = require('fs');
+const spdy = require('spdy');
 
 const app = express();
 const port = 5004;
@@ -21,7 +23,14 @@ app.get('/bestDriver', (req, res) => {
     const start = req.query.start;
     const end = req.query.end;
     // Get roster from roster service
-    request.get('http://alleys-roster:5003/roster', {json: true}, (rosterErr, rosterRes, rosterBody) => {
+    let options = {
+      uri: 'https://alleys-roster:5003/roster',
+      json: true,
+      agentOptions: {
+        rejectUnauthorized: false
+      }
+    };
+    request.get(options, (rosterErr, rosterRes, rosterBody) => {
       if (rosterErr) {
         throw(rosterErr);
       }
@@ -41,7 +50,7 @@ app.get('/bestDriver', (req, res) => {
         }).end();
       }
       // Get route info from mapping service
-      const options = {
+      options = {
         uri: 'http://alleys-mapping:5002/route',
         json: true,
         qs: {
@@ -100,7 +109,13 @@ app.get('/bestDriver', (req, res) => {
 });
 
 
+// Create server
+const server = spdy.createServer({
+  key: fs.readFileSync('certificates/key.pem'),
+  cert: fs.readFileSync('certificates/cert.pem')
+}, app);
+
 // Start listening
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });

@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongodb = require('mongodb');
 const request = require('request');
+const fs = require('fs');
+const spdy = require('spdy');
 
 const MongoClient = mongodb.MongoClient;
 const Server = mongodb.Server;
@@ -127,7 +129,13 @@ app.delete('/roster/:driverUsername', async (req, res) => {
 });
 
 
+// Create server
+const server = spdy.createServer({
+  key: fs.readFileSync('certificates/key.pem'),
+  cert: fs.readFileSync('certificates/cert.pem')
+}, app);
+
 // Start listening
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
