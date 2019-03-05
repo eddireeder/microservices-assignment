@@ -44,7 +44,7 @@ Run the Docker images in their containers with:
 ```
 docker run --name alleys-db --net alleysnet -d mongo
 docker run --name alleys-authentication --net alleysnet -p 5001:5001 -d authimage
-docker run --name alleys-mapping --net alleysnet -p 5002:5002 -d mappingimage
+docker run --name alleys-mapping --net alleysnet -d mappingimage
 docker run --name alleys-roster --net alleysnet -p 5003:5003 -d rosterimage
 docker run --name alleys-best-driver --net alleysnet -p 5004:5004 -d bestdriverimage
 ```
